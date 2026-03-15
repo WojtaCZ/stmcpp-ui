@@ -1,6 +1,7 @@
 #include <ui/navigator.hpp>
 #include <ui/theme.hpp>
 #include <ui/menu_screen.hpp>
+#include <gfx/offset_framebuffer.hpp>
 
 namespace ui {
 
@@ -72,7 +73,8 @@ namespace ui {
 
         if (!cur->isDirty()) return false;
 
-        cur->render(fb, *theme_);
+        gfx::OffsetFrameBuffer<uint8_t> offsetFb(fb, theme_->displayOffsetX, 0);
+        cur->render(offsetFb, *theme_);
         return true;
     }
 

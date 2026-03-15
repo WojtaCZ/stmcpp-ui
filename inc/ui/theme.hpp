@@ -43,6 +43,7 @@ namespace ui {
     struct Theme {
         int displayWidth = 130;
         int displayHeight = 64;
+        int displayOffsetX = 0;
 
         const gfx::text::font* titleFont = nullptr;
         const gfx::text::font* itemFont = nullptr;
