@@ -18,6 +18,7 @@ namespace ui {
             void tickScroll(int elapsedMs) override;
 
             int selectedIndex() const { return selectedIndex_; }
+            void setSelectedIndex(int idx) { if (idx >= 0 && idx < itemCount_) selectedIndex_ = idx; }
             MenuItem* selectedItem() { return &items_[selectedIndex_]; }
             MenuItem* itemAt(int index) { return &items_[index]; }
             int itemCount() const { return itemCount_; }
