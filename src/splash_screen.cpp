@@ -21,8 +21,30 @@ namespace ui {
         return false;
     }
 
+    void SplashScreen::drawComment(gfx::IFrameBuffer<uint8_t>& fb, const Theme& theme,
+                                   const char* text, const TextScroll& scroll, int y) {
+        if (!text || text[0] == '\0') return;
+
+        int fw = static_cast<int>(theme.smallFont->width());
+        int maxChars = commentMaxChars_;
+        int len = static_cast<int>(std::strlen(text));
+        int offset = scroll.offset(len, maxChars);
+
+        char buf[32];
+        int copyLen = len - offset > maxChars ? maxChars : len - offset;
+        std::memcpy(buf, text + offset, static_cast<std::size_t>(copyLen));
+        buf[copyLen] = '\0';
+
+        int x = (theme.displayWidth - copyLen * fw) / 2;
+        gfx::text::drawText(fb, *theme.smallFont, buf, x, y,
+                            gfx::Anchor::TopLeft, uint8_t(1));
+    }
+
     void SplashScreen::render(gfx::IFrameBuffer<uint8_t>& fb, const Theme& theme) {
         gfx::fill(fb, uint8_t(0));
+
+        bool hasComment2 = comment2_ && comment2_[0] != '\0';
+        int subtitleY = hasComment2 ? 20 : 25;
 
         // Title centered at top, using item font (11x18)
         if (title_ && title_[0] != '\0' && theme.itemFont) {
@@ -60,31 +82,30 @@ namespace ui {
 
             int textW = copyLen * fw;
             int x = (theme.displayWidth - textW) / 2;
-            gfx::text::drawText(fb, *theme.itemFont, buf, x, 25,
+            gfx::text::drawText(fb, *theme.itemFont, buf, x, subtitleY,
                                 gfx::Anchor::TopLeft, uint8_t(1));
         }
 
-        // Comment centered at y=53, using small font (7x10)
-        if (comment_ && comment_[0] != '\0' && theme.smallFont) {
+        // Comment(s), centered when they fit, scrolled otherwise (small font 7x10)
+        if (theme.smallFont) {
             int fw = static_cast<int>(theme.smallFont->width());
-            int commentLen = static_cast<int>(std::strlen(comment_));
             int maxChars = theme.displayWidth / fw;
-            char buf[32];
-            int copyLen = commentLen > maxChars ? maxChars : commentLen;
-            if (copyLen > 31) copyLen = 31;
-            std::memcpy(buf, comment_, static_cast<std::size_t>(copyLen));
-            buf[copyLen] = '\0';
+            if (maxChars > 31) maxChars = 31;
+            commentMaxChars_ = maxChars;
 
-            int textW = copyLen * fw;
-            int x = (theme.displayWidth - textW) / 2;
-            gfx::text::drawText(fb, *theme.smallFont, buf, x, 53,
-                                gfx::Anchor::TopLeft, uint8_t(1));
+            drawComment(fb, theme, comment_, commentScroll_, hasComment2 ? 42 : 53);
+            if (hasComment2) drawComment(fb, theme, comment2_, comment2Scroll_, 53);
         }
 
         clearDirty();
     }
 
     void SplashScreen::tickScroll(int elapsedMs) {
+        if (comment_ && commentScroll_.tick(elapsedMs, static_cast<int>(std::strlen(comment_)), commentMaxChars_))
+            markDirty();
+        if (comment2_ && comment2Scroll_.tick(elapsedMs, static_cast<int>(std::strlen(comment2_)), commentMaxChars_))
+            markDirty();
+
         if (!subtitle_ || !subtitle_[0]) return;
 
         int subLen = static_cast<int>(std::strlen(subtitle_));

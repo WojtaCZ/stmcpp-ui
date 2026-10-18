@@ -3,6 +3,7 @@
 
 #include "screen.hpp"
 #include "input.hpp"
+#include "text_scroll.hpp"
 
 namespace ui {
 
@@ -20,12 +21,18 @@ namespace ui {
 
             void setTitle(const char* t) { title_ = t; markDirty(); }
             void setSubtitle(const char* s) { subtitle_ = s; markDirty(); }
-            void setComment(const char* c) { comment_ = c; markDirty(); }
+            void setComment(const char* c) { comment_ = c; commentScroll_.reset(); markDirty(); }
+            // Optional second comment line under the first; with it the title and subtitle move up
+            void setComment2(const char* c) { comment2_ = c; comment2Scroll_.reset(); markDirty(); }
 
         private:
+            void drawComment(gfx::IFrameBuffer<uint8_t>& fb, const Theme& theme,
+                             const char* text, const TextScroll& scroll, int y);
+
             const char* title_;
             const char* subtitle_;
             const char* comment_;
+            const char* comment2_ = nullptr;
             DismissCallback onDismiss_;
             void* userData_;
 
@@ -33,6 +40,11 @@ namespace ui {
             int scrollTimerMs_ = 0;
             bool scrollPaused_ = true;
             bool hadScrollPause_ = false;
+
+            // Comments longer than the display scroll; characters per line known after render
+            TextScroll commentScroll_;
+            TextScroll comment2Scroll_;
+            int commentMaxChars_ = 0;
     };
 
 }

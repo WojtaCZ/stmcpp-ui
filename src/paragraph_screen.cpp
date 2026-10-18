@@ -27,6 +27,8 @@ namespace ui {
         int fw = static_cast<int>(theme.smallFont->width());
         int fh = static_cast<int>(theme.smallFont->height());
         int maxChars = theme.displayWidth / fw;
+        if (maxChars > 31) maxChars = 31;
+        maxChars_ = maxChars;
         int lineSpacing = fh + 2;
         int yPos = 0;
 
@@ -34,10 +36,10 @@ namespace ui {
             if (!lines_[i]) continue;
 
             int len = static_cast<int>(std::strlen(lines_[i]));
+            int offset = scroll_.offset(len, maxChars);
             char buf[32];
-            int copyLen = len > maxChars ? maxChars : len;
-            if (copyLen > 31) copyLen = 31;
-            std::memcpy(buf, lines_[i], static_cast<std::size_t>(copyLen));
+            int copyLen = len - offset > maxChars ? maxChars : len - offset;
+            std::memcpy(buf, lines_[i] + offset, static_cast<std::size_t>(copyLen));
             buf[copyLen] = '\0';
 
             gfx::text::drawText(fb, *theme.smallFont, buf, 2, yPos,
@@ -46,6 +48,25 @@ namespace ui {
         }
 
         clearDirty();
+    }
+
+    void ParagraphScreen::onEnter() {
+        scroll_.reset();
+    }
+
+    void ParagraphScreen::tickScroll(int elapsedMs) {
+        if (!lines_) return;
+
+        // The longest line sets the cycle; shorter overlong lines stop at their end
+        int longest = 0;
+        for (int i = 0; i < lineCount_; ++i) {
+            if (!lines_[i]) continue;
+            int len = static_cast<int>(std::strlen(lines_[i]));
+            if (len > longest) longest = len;
+        }
+
+        if (scroll_.tick(elapsedMs, longest, maxChars_))
+            markDirty();
     }
 
 }
