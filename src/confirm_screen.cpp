@@ -111,10 +111,10 @@ namespace ui {
         }
 
         // Draw options at bottom, same Y
-        const char* yesText = "Yes";
-        const char* noText = "No";
-        int yesW = 3 * fw;
-        int noW = 2 * fw;
+        const char* yesText = "Ano";
+        const char* noText = "Ne";
+        int yesW = static_cast<int>(std::strlen(yesText)) * fw;
+        int noW = static_cast<int>(std::strlen(noText)) * fw;
         int pad = 2;
 
         int yesX = theme.displayWidth / 3 - yesW / 2;

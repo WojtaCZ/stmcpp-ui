@@ -36,7 +36,7 @@ namespace ui {
             MenuItem(const char* title, Screen* submenu)
                 : title_(title), type_(Type::Submenu), submenu_(submenu) {}
 
-            static MenuItem back(const char* title = "Back") {
+            static MenuItem back(const char* title = "Zpet") {
                 MenuItem item;
                 item.title_ = title;
                 item.type_ = Type::Back;

@@ -112,7 +112,7 @@ namespace ui {
 
         // Draw hint
         if (theme.smallFont) {
-            const char* hint = digitEntry_ ? "[digits] Enter/Back" : "Up/Down Enter/Back";
+            const char* hint = digitEntry_ ? "[cislice] OK/Zpet" : "Nahoru/Dolu OK";
             gfx::text::drawText(fb, *theme.smallFont, hint, 2, 53,
                                 gfx::Anchor::TopLeft, uint8_t(1));
         }
