@@ -4,6 +4,7 @@
 #include "screen.hpp"
 #include "item.hpp"
 #include "input.hpp"
+#include "text_scroll.hpp"
 #include <cstddef>
 
 namespace ui {
@@ -23,6 +24,8 @@ namespace ui {
             MenuItem* itemAt(int index) { return &items_[index]; }
             int itemCount() const { return itemCount_; }
             const char* title() const { return title_; }
+            // Title text (stable pointer); redraws only when it changes
+            void setTitle(const char* title) { if (title != title_) { title_ = title; markDirty(); } }
 
         private:
             const char* title_;
@@ -30,11 +33,9 @@ namespace ui {
             int itemCount_;
             int selectedIndex_ = 0;
 
-            // Scroll state machine
-            int scrollOffset_ = 0;
-            int scrollTimerMs_ = 0;
-            bool scrollPaused_ = true;
-            bool hadScrollPause_ = false;
+            // Long selected item scrolls; characters per row known after the first render
+            TextScroll scroll_;
+            int maxChars_ = 0;
     };
 
 }

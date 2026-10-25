@@ -20,7 +20,7 @@ namespace ui {
             void tickScroll(int elapsedMs) override;
 
             void setTitle(const char* t) { title_ = t; markDirty(); }
-            void setSubtitle(const char* s) { subtitle_ = s; markDirty(); }
+            void setSubtitle(const char* s) { subtitle_ = s; subtitleScroll_.reset(); markDirty(); }
             void setComment(const char* c) { comment_ = c; commentScroll_.reset(); markDirty(); }
             // Optional second comment line under the first; with it the title and subtitle move up
             void setComment2(const char* c) { comment2_ = c; comment2Scroll_.reset(); markDirty(); }
@@ -36,12 +36,9 @@ namespace ui {
             DismissCallback onDismiss_;
             void* userData_;
 
-            int scrollOffset_ = 0;
-            int scrollTimerMs_ = 0;
-            bool scrollPaused_ = true;
-            bool hadScrollPause_ = false;
-
-            // Comments longer than the display scroll; characters per line known after render
+            // Subtitle and comments longer than the display scroll; characters per line known after render
+            TextScroll subtitleScroll_;
+            int subtitleMaxChars_ = 0;
             TextScroll commentScroll_;
             TextScroll comment2Scroll_;
             int commentMaxChars_ = 0;

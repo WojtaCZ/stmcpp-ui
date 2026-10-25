@@ -1,4 +1,5 @@
 #include <ui/number_screen.hpp>
+#include <ui/list.hpp>
 #include <ui/theme.hpp>
 #include <gfx/text.hpp>
 #include <gfx/shapes.hpp>
@@ -91,11 +92,7 @@ namespace ui {
     void NumberScreen::render(gfx::IFrameBuffer<uint8_t>& fb, const Theme& theme) {
         gfx::fill(fb, uint8_t(0));
 
-        // Draw prompt
-        if (prompt_ && prompt_[0] != '\0' && theme.smallFont) {
-            gfx::text::drawText(fb, *theme.smallFont, prompt_, 2, 0,
-                                gfx::Anchor::TopLeft, uint8_t(1));
-        }
+        drawTitleBar(fb, theme, prompt_);
 
         // Draw value centered
         if (theme.itemFont) {
@@ -110,12 +107,7 @@ namespace ui {
                                 gfx::Anchor::TopLeft, uint8_t(1));
         }
 
-        // Draw hint
-        if (theme.smallFont) {
-            const char* hint = digitEntry_ ? "[cislice] OK/Zpet" : "Nahoru/Dolu OK";
-            gfx::text::drawText(fb, *theme.smallFont, hint, 2, 53,
-                                gfx::Anchor::TopLeft, uint8_t(1));
-        }
+        drawHint(fb, theme, digitEntry_ ? "[cislice] OK/Zpet" : "Nahoru/Dolu OK");
 
         clearDirty();
     }

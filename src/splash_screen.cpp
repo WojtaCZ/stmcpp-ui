@@ -1,4 +1,5 @@
 #include <ui/splash_screen.hpp>
+#include <ui/list.hpp>
 #include <ui/theme.hpp>
 #include <gfx/text.hpp>
 #include <gfx/shapes.hpp>
@@ -67,10 +68,10 @@ namespace ui {
         if (subtitle_ && subtitle_[0] != '\0' && theme.itemFont) {
             int fw = static_cast<int>(theme.itemFont->width());
             int maxChars = theme.displayWidth / fw;
+            subtitleMaxChars_ = maxChars;
             int subLen = static_cast<int>(std::strlen(subtitle_));
 
-            int offset = scrollOffset_;
-            if (offset > subLen) offset = 0;
+            int offset = subtitleScroll_.offset(subLen, maxChars);
 
             char buf[32];
             int copyLen = subLen - offset;
@@ -93,8 +94,11 @@ namespace ui {
             if (maxChars > 31) maxChars = 31;
             commentMaxChars_ = maxChars;
 
-            drawComment(fb, theme, comment_, commentScroll_, hasComment2 ? 42 : 53);
-            if (hasComment2) drawComment(fb, theme, comment2_, comment2Scroll_, 53);
+            // The (last) comment sits on the bottom line, like the key hints of the other screens
+            int bottom = hintY(theme);
+            int lineH = static_cast<int>(theme.smallFont->height()) + 1;
+            drawComment(fb, theme, comment_, commentScroll_, hasComment2 ? bottom - lineH : bottom);
+            if (hasComment2) drawComment(fb, theme, comment2_, comment2Scroll_, bottom);
         }
 
         clearDirty();
@@ -106,45 +110,8 @@ namespace ui {
         if (comment2_ && comment2Scroll_.tick(elapsedMs, static_cast<int>(std::strlen(comment2_)), commentMaxChars_))
             markDirty();
 
-        if (!subtitle_ || !subtitle_[0]) return;
-
-        int subLen = static_cast<int>(std::strlen(subtitle_));
-        int maxChars = 11; // approx display width / 11px font
-
-        if (subLen <= maxChars) {
-            scrollPaused_ = true;
-            return;
-        }
-
-        if (scrollPaused_) {
-            scrollTimerMs_ += elapsedMs;
-            if (scrollTimerMs_ >= 1000) {
-                scrollPaused_ = false;
-                scrollTimerMs_ = 0;
-                if (!hadScrollPause_) hadScrollPause_ = true;
-            }
-            return;
-        }
-
-        scrollTimerMs_ += elapsedMs;
-        if (scrollTimerMs_ >= 500) {
-            scrollTimerMs_ = 0;
-
-            int maxOffset = subLen - maxChars;
-            if (scrollOffset_ < maxOffset) {
-                ++scrollOffset_;
-                if (scrollOffset_ == maxOffset) {
-                    scrollPaused_ = true;
-                    scrollTimerMs_ = 0;
-                }
-            } else {
-                scrollOffset_ = 0;
-                scrollPaused_ = true;
-                scrollTimerMs_ = 0;
-                hadScrollPause_ = false;
-            }
+        if (subtitle_ && subtitleScroll_.tick(elapsedMs, static_cast<int>(std::strlen(subtitle_)), subtitleMaxChars_))
             markDirty();
-        }
     }
 
 }

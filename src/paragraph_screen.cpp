@@ -1,4 +1,5 @@
 #include <ui/paragraph_screen.hpp>
+#include <ui/list.hpp>
 #include <ui/theme.hpp>
 #include <gfx/text.hpp>
 #include <gfx/shapes.hpp>
@@ -26,11 +27,18 @@ namespace ui {
 
         int fw = static_cast<int>(theme.smallFont->width());
         int fh = static_cast<int>(theme.smallFont->height());
-        int maxChars = theme.displayWidth / fw;
+        int maxChars = (theme.displayWidth - theme.leftMargin) / fw;
         if (maxChars > 31) maxChars = 31;
         maxChars_ = maxChars;
-        int lineSpacing = fh + 2;
+
+        // With a title: lines packed under the title bar (5 lines fit); without: 2 px gaps
+        bool titled = title_ && title_[0] != '\0';
+        int lineSpacing = titled ? fh : fh + 2;
         int yPos = 0;
+        if (titled) {
+            drawTitleBar(fb, theme, title_);
+            yPos = theme.titleBarHeight + 1;
+        }
 
         for (int i = 0; i < lineCount_; ++i) {
             if (!lines_[i]) continue;
@@ -42,7 +50,7 @@ namespace ui {
             std::memcpy(buf, lines_[i] + offset, static_cast<std::size_t>(copyLen));
             buf[copyLen] = '\0';
 
-            gfx::text::drawText(fb, *theme.smallFont, buf, 2, yPos,
+            gfx::text::drawText(fb, *theme.smallFont, buf, theme.leftMargin, yPos,
                                 gfx::Anchor::TopLeft, uint8_t(1));
             yPos += lineSpacing;
         }

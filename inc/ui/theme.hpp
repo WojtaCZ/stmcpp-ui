@@ -52,7 +52,7 @@ namespace ui {
         int titleBarHeight = 12;
         int itemStartY = 21;
         int itemSpacing = 3;
-        int leftMargin = 0;
+        int leftMargin = 2;
         int iconTextGap = 3;
         int visibleItems = 2;
         int scrollArrowX = 117;

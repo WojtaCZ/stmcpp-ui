@@ -17,6 +17,8 @@ namespace ui {
             bool handleInput(InputEvent event) override;
             void render(gfx::IFrameBuffer<uint8_t>& fb, const Theme& theme) override;
             void onEnter() override;
+            // Optional title bar (stable pointer); without it the lines start at the top
+            void setTitle(const char* title) { title_ = title; markDirty(); }
             // Lines longer than the display scroll (all together, each stops at its own end)
             void tickScroll(int elapsedMs) override;
 
@@ -25,6 +27,7 @@ namespace ui {
             int lineCount_;
             DismissCallback onDismiss_;
             void* userData_;
+            const char* title_ = nullptr;
 
             TextScroll scroll_;
             int maxChars_ = 0; // characters per line, known after the first render
