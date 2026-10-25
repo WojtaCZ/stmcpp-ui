@@ -21,6 +21,8 @@ All code lives in namespace `ui::`. PixelType is fixed to `uint8_t`.
 - **`paragraph_screen.hpp`** — Multi-line `const char*` text display with dismiss callback.
 - **`number_screen.hpp`** — Numeric value entry. Supports rotary (Up/Down ±step) and direct digit input (Digit0-9). Enter confirms, Back cancels.
 - **`confirm_screen.hpp`** — Yes/No dialog. Up/Down toggles, Enter confirms.
+- **`progress.hpp`** — `drawProgress()`: title, bordered bar with fill and hint on a cleared framebuffer; exports `kProgressBarY`/`kProgressBarH` (the bootloaders derive their bar-only redraw rows from them). Depends on `lib/gfx` only because the bootloaders link it.
+- **`progress_screen.hpp`** — `ProgressScreen`: progress bar screen (shutdown, firmware update), ignores input. `setPercent()`, `setHint()`; `setHint()` compares **pointers**, so hints must be string literals (or otherwise stable pointers).
 - **`navigator.hpp`** — Fixed-size screen stack (depth 8). `push()`/`pop()`/`reset()`, `handleInput()`, `render()`, `tickScroll()`. Auto-pops on unhandled Back.
 
 ### Sources (`src/`)

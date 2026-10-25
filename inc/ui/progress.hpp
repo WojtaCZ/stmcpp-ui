@@ -7,6 +7,11 @@
 
 namespace ui {
 
+    // Pozice ramecku ukazatele (y, vyska v pixelech). Bootloader z nich odvozuje radky stranek,
+    // ktere pri zmene procent prekresluje (static_assert v midicontrol-bootloader/src/oled.cpp).
+    constexpr int kProgressBarY = 26;
+    constexpr int kProgressBarH = 12;
+
     // Vykresli celou obrazovku s ukazatelem postupu: smaze fb, nahore vycentrovany nazev,
     // uprostred ramecek s vyplni, dole vycentrovana napoveda. percent se omezi na 100,
     // nullptr u title/hint znamena, ze se radek nekresli.

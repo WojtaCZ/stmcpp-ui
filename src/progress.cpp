@@ -21,7 +21,7 @@ namespace ui {
         drawCentred(fb, font, width, hint, 48);
 
         // Ukazatel postupu
-        const int x = 4, y = 26, w = width - 8, h = 12;
+        const int x = 4, y = kProgressBarY, w = width - 8, h = kProgressBarH;
         gfx::drawRect(fb, x, y, w, h, static_cast<uint8_t>(1));
         int fill = (w - 4) * percent / 100;
         if (fill > 0) gfx::drawFilledRect(fb, x + 2, y + 2, fill, h - 4, static_cast<uint8_t>(1));
